@@ -44,6 +44,7 @@ class _MyAppState extends State<MyApp> {
       result = error.toString();
     }
     setState(() {
+      disposeResult = "Dispose Result";
       streamResult = result!;
     });
   }
@@ -68,8 +69,15 @@ class _MyAppState extends State<MyApp> {
       result = error.toString();
     }
     setState(() {
-      disposeResult = result!;
+      if (!result!.contains("error the borescope is not active")) streamResult = "closed";
+      disposeResult = result;
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    disposeBorescope();
   }
 
   @override
@@ -82,17 +90,6 @@ class _MyAppState extends State<MyApp> {
           body: SingleChildScrollView(
             child: Column(
               children: [
-                //SSID Result
-                Center(
-                  child: Text(ssidResult),
-                ),
-                //SSID Button
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () => verifySSID(),
-                    child: const Text("Verify SSID"),
-                  ),
-                ),
                 //Init Result
                 Center(
                   child: Text(initResult),
@@ -102,6 +99,17 @@ class _MyAppState extends State<MyApp> {
                   child: ElevatedButton(
                     onPressed: () => initBorescope(),
                     child: const Text("Init Borescope"),
+                  ),
+                ),
+                //SSID Result
+                Center(
+                  child: Text(ssidResult),
+                ),
+                //SSID Button
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () => verifySSID(),
+                    child: const Text("Verify SSID"),
                   ),
                 ),
                 //Stream Result
@@ -126,6 +134,8 @@ class _MyAppState extends State<MyApp> {
                     child: const Text("Dispose Borescope"),
                   ),
                 ),
+                //Image Base64
+                Center(child: Text(_borescopeController.imageString)),
               ],
             ),
           )),

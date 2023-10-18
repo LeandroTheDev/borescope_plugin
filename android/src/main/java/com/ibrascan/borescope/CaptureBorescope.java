@@ -3,9 +3,6 @@ package com.ibrascan.borescope;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
-import android.net.wifi.SupplicantState;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 
 import org.json.JSONObject;
 
@@ -23,31 +20,10 @@ public class CaptureBorescope {
             Manifest.permission.ACCESS_WIFI_STATE,
             Manifest.permission.ACCESS_FINE_LOCATION
     };
-    CaptureBorescope(Context context, Activity activity){
-        this.context = context;
-        this.activity = activity;
-    }
 
     public void initStream(MethodChannel.Result result, Stream stream) {
         this.result = result;
         stream.destroy();
         result.success("success open borescope");
     }
-
-    public String verifyBorescopeSSID() {
-        WifiManager wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(context.WIFI_SERVICE);
-        WifiInfo wifiInfo;
-
-        wifiInfo = wifiManager.getConnectionInfo();
-        if (wifiInfo.getSupplicantState() == SupplicantState.COMPLETED) {
-            String ssid = wifiInfo.getSSID();
-            if(ssid.toLowerCase().contains("HOWiFi".toLowerCase())) {
-                return ssid;
-            } else {
-                return "not borescope " + ssid.toString();
-            }
-        } else {
-            return "no permission";
-        }
-     }
 }

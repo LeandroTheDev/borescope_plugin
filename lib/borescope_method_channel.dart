@@ -15,6 +15,9 @@ class MethodChannelBorescope extends BorescopePlatform {
 
   @override
   Future<String?> initBorescope(BorescopeController controller) async {
+    if (isRunning) {
+      return "error borescope already running";
+    }
     final result = await methodChannel.invokeMethod<String>('init');
     if (result == "success initialized") {
       isRunning = true;
@@ -28,10 +31,11 @@ class MethodChannelBorescope extends BorescopePlatform {
       return "error borescope not running";
     }
     try {
+      final result = await methodChannel.invokeMethod<String>('openBorescope');
       eventChannel.receiveBroadcastStream().listen((event) {
         controller.imageString = event;
       });
-      return "success stream";
+      return result;
     } catch (error) {
       return error.toString();
     }
@@ -39,12 +43,18 @@ class MethodChannelBorescope extends BorescopePlatform {
 
   @override
   Future<String?> verifySSID() async {
+    if (!isRunning) {
+      return "error controller not initialized";
+    }
     final result = await methodChannel.invokeMethod<String>('verifySSID');
     return result;
   }
 
   @override
   Future<String?> dispose() async {
+    if (!isRunning) {
+      return "error the borescope is not active";
+    }
     final result = await methodChannel.invokeMethod<String>('destroy');
     return result;
   }

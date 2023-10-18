@@ -9,6 +9,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Base64;
 import android.util.Log;
+import android.net.wifi.SupplicantState;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 
 import androidx.annotation.NonNull;
 
@@ -26,22 +29,24 @@ public class BorescopeActivity extends FlutterActivity {
     //Borescope
     private Stream stream;
     private Socket socket;
+    private CaptureBorescope borescope;
     //Borescope Functions
-    public void initialization(MethodChannel.Result result, Handler handler){
-        context = getContext();
-        activity = getActivity();
-        stream = new Stream(getContext(), handler, getTempFolder(this));
+    public void initialization(MethodChannel.Result result, Handler handler, Context context, Activity activity){
+        this.context = context;
+        this.activity = activity;
+        this.borescope = new CaptureBorescope();
+        this.stream = new Stream(context, handler, getTempFolder(this));
         result.success("success initialized");
     }
 
     public void destroy(MethodChannel.Result result) {
-        stream.destroy();
-        stream.isRunning = false;
+        this.stream.destroy();
+        this.stream.isRunning = false;
         result.success("success destroyed");
     }
 
     public void iniciarStream(MethodChannel.Result result){
-        stream.startStream();
+        this.stream.startStream();
         result.success("success opened");
     }
 
@@ -69,8 +74,19 @@ public class BorescopeActivity extends FlutterActivity {
         return encodedImage;
     }
     public String verificarSSID() {
-        final CaptureBorescope borescope = new CaptureBorescope(context, activity);
-        String ssid = borescope.verifyBorescopeSSID();
-        return ssid;
+        WifiManager wifiManager = (WifiManager) this.activity.getApplicationContext().getSystemService(context.WIFI_SERVICE);
+        WifiInfo wifiInfo;
+
+        wifiInfo = wifiManager.getConnectionInfo();
+        if (wifiInfo.getSupplicantState() == SupplicantState.COMPLETED) {
+            String ssid = wifiInfo.getSSID();
+            if(ssid.toLowerCase().contains("HOWiFi".toLowerCase())) {
+                return ssid;
+            } else {
+                return "not borescope " + ssid.toString();
+            }
+        } else {
+            return "no permission";
+        }
     }
 }
