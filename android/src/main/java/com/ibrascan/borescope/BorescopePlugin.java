@@ -24,8 +24,9 @@ public class BorescopePlugin implements FlutterPlugin, MethodCallHandler, Activi
   private EventChannel.EventSink eventSink;
   //Handler
   Handler handler;
-  //Activity
+  //Borescope
   BorescopeActivity borescopeActivity;
+  Stream
   //Android
   Context context;
   Activity activity;
@@ -62,6 +63,7 @@ public class BorescopePlugin implements FlutterPlugin, MethodCallHandler, Activi
           switch(i) {
             case HandlerParams.REMOTE_TAKE_PHOTO: borescopeActivity.tirarFoto(); return true;
             case HandlerParams.ERROR_NOT_FOUND: eventSink.success("noconnection"); return true;
+            case HandlerParams.STREAM_VIDEO: eventSink.success(borescopeActivity.atualizarImagem()); return true;
             case HandlerParams.TAKE_PICTURE: result.success(borescopeActivity.atualizarImagem()); return true;
             case HandlerParams.SDCARD_FULL: result.success("noimage"); return true;
             default: eventSink.success("null"); return true;

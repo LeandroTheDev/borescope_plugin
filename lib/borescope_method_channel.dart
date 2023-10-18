@@ -1,5 +1,10 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:js_interop';
+
 import 'package:borescope/borescope.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'borescope_platform_interface.dart';
@@ -9,6 +14,7 @@ class MethodChannelBorescope extends BorescopePlatform {
   @visibleForTesting
   final methodChannel = const MethodChannel('com.ibrascan.borescope/main');
   final eventChannel = const EventChannel('com.ibrascan.borescope/image');
+  late StreamSubscription<dynamic> _eventSubscription;
 
   //Handler
   bool isRunning = false;
@@ -32,19 +38,33 @@ class MethodChannelBorescope extends BorescopePlatform {
     }
     try {
       final result = await methodChannel.invokeMethod<String>('openBorescope');
-      eventChannel.receiveBroadcastStream().listen((event) {
+      _eventSubscription = eventChannel.receiveBroadcastStream().listen((event) {
+        //Verify connection problems
+        if (event == "noconnection" || event == "noimage" || event == "null") {
+          //Create a blank image
+          Uint8List blankBytes = const Base64Codec().decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7");
+          controller.image = Image.memory(
+            blankBytes,
+            height: 1,
+          );
+        }
+        //Transcode base64 into image
+        else {
+          List<int> bytes = base64Decode(event);
+          controller.image = Image.memory(Uint8List.fromList(bytes));
+        }
         controller.imageString = event;
       });
       return result;
     } catch (error) {
-      return error.toString();
+      return "error $error";
     }
   }
 
   @override
   Future<String?> verifySSID() async {
     if (!isRunning) {
-      return "error controller not initialized";
+      return "error borescope not initialized";
     }
     final result = await methodChannel.invokeMethod<String>('verifySSID');
     return result;
@@ -55,7 +75,9 @@ class MethodChannelBorescope extends BorescopePlatform {
     if (!isRunning) {
       return "error the borescope is not active";
     }
+    if (_eventSubscription.isUndefinedOrNull) return "error the stream must be initialized";
     final result = await methodChannel.invokeMethod<String>('destroy');
+    _eventSubscription.cancel();
     return result;
   }
 }

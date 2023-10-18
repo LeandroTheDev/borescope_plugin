@@ -160,7 +160,7 @@ public class Stream {
                     byte[] b = baos.toByteArray();
                     this.imagem = b;
                     Message message = new Message();
-                    message.what = HandlerParams.TAKE_PICTURE;
+                    message.what = HandlerParams.STREAM_VIDEO;
                     this.handler.sendMessage(message);
                 }
             }

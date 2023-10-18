@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:flutter/material.dart';
+
 import 'borescope_platform_interface.dart';
 
 class Borescope {
@@ -20,4 +25,8 @@ class Borescope {
 
 class BorescopeController {
   String imageString = "noimage";
+  Image image = Image.memory(
+    const Base64Codec().decode("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"),
+    height: 1,
+  );
 }
