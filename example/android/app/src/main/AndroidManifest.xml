@@ -30,4 +30,11 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!--GPS PLUGIN-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" /> <!--GPS PLUGIN-->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /> <!--BOROSCOPE PLUGIN-->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" /> <!--CAMERA PLUGIN-->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!--SAVING FILE-->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!--SAVING FILE-->
 </manifest>
