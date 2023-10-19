@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
   void verifySSID() async {
     late final String? result;
     try {
-      result = await _borescopePlugin.verifySSID();
+      result = await _borescopePlugin.verifySSID(_borescopeController);
     } catch (error) {
       result = error.toString();
     }
@@ -64,7 +64,7 @@ class _MyAppState extends State<MyApp> {
   void disposeBorescope() async {
     late final String? result;
     try {
-      result = await _borescopePlugin.dispose();
+      result = await _borescopePlugin.dispose(_borescopeController);
     } catch (error) {
       result = error.toString();
     }

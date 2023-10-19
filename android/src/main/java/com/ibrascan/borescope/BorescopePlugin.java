@@ -23,13 +23,13 @@ public class BorescopePlugin implements FlutterPlugin, MethodCallHandler, Activi
   private EventChannel streamChannel;
   private EventChannel.EventSink eventSink;
   //Handler
-  Handler handler;
+  private Handler handler;
   //Borescope
-  BorescopeActivity borescopeActivity;
-  Stream
+  private BorescopeActivity borescopeActivity;
+  private Stream stream;
   //Android
-  Context context;
-  Activity activity;
+  private Context context;
+  private Activity activity;
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {

@@ -24,11 +24,11 @@ abstract class BorescopePlatform extends PlatformInterface {
     throw UnimplementedError('initStream not implemented');
   }
 
-  Future<String?> verifySSID() {
+  Future<String?> verifySSID(BorescopeController controller) {
     throw UnimplementedError('verifySSID not implemented');
   }
 
-  Future<String?> dispose() {
+  Future<String?> dispose(BorescopeController controller) {
     throw UnimplementedError('dispose not implemented');
   }
 }

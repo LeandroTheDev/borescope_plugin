@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:js_interop';
 
 import 'package:borescope/borescope.dart';
 import 'package:flutter/foundation.dart';
@@ -16,24 +15,21 @@ class MethodChannelBorescope extends BorescopePlatform {
   final eventChannel = const EventChannel('com.ibrascan.borescope/image');
   late StreamSubscription<dynamic> _eventSubscription;
 
-  //Handler
-  bool isRunning = false;
-
   @override
   Future<String?> initBorescope(BorescopeController controller) async {
-    if (isRunning) {
+    if (controller.isRunning) {
       return "error borescope already running";
     }
     final result = await methodChannel.invokeMethod<String>('init');
     if (result == "success initialized") {
-      isRunning = true;
+      controller.isRunning = true;
     }
     return result;
   }
 
   @override
   Future<String?> initStream(BorescopeController controller) async {
-    if (!isRunning) {
+    if (!controller.isRunning) {
       return "error borescope not running";
     }
     try {
@@ -54,6 +50,9 @@ class MethodChannelBorescope extends BorescopePlatform {
           controller.image = Image.memory(Uint8List.fromList(bytes));
         }
         controller.imageString = event;
+        //Verify if imageChanged function is declarated
+        if (controller.imageChanged == null) return;
+        controller.imageChanged!();
       });
       return result;
     } catch (error) {
@@ -62,8 +61,8 @@ class MethodChannelBorescope extends BorescopePlatform {
   }
 
   @override
-  Future<String?> verifySSID() async {
-    if (!isRunning) {
+  Future<String?> verifySSID(BorescopeController controller) async {
+    if (!controller.isRunning) {
       return "error borescope not initialized";
     }
     final result = await methodChannel.invokeMethod<String>('verifySSID');
@@ -71,11 +70,14 @@ class MethodChannelBorescope extends BorescopePlatform {
   }
 
   @override
-  Future<String?> dispose() async {
-    if (!isRunning) {
+  Future<String?> dispose(BorescopeController controller) async {
+    if (!controller.isRunning) {
       return "error the borescope is not active";
     }
-    if (_eventSubscription.isUndefinedOrNull) return "error the stream must be initialized";
+    if (!controller.isRunning) return "error the stream must be initialized";
+    //Disable functions parameters to avoid errors in dispose
+    controller.imageChanged = null;
+    controller.runningChanged = null;
     final result = await methodChannel.invokeMethod<String>('destroy');
     _eventSubscription.cancel();
     return result;
